@@ -1,4 +1,4 @@
-colorscheme 0x7A69_dark
+colorscheme ego
 
 set t_Co=256
 set background=dark
@@ -10,10 +10,10 @@ set wrap
 set wildmenu
 set encoding=utf-8
 
-" Indentation
-set tabstop=4
-set shiftwidth=4
-set softtabstop=4
+" Indentation 
+set tabstop=2
+set shiftwidth=2
+set softtabstop=2
 set expandtab
 set guioptions=T
 set smartindent
@@ -24,17 +24,13 @@ set incsearch
 set smartcase
 set showmatch
 
-" Windows backspace
-set backspace=2
-set backspace=indent,eol,start
-
 " Fonts
-set guifont=Consolas:h14:cANSI
+set guifont=DejaVu\ Sans\ Mono\ 13
 
 " Backup setup
 set backup
-set backupdir=~/.tmp,~/tmp,/tmp
-set directory=~/.tmp,~/tmp,/tmp
+set backupdir=~/.tmp,/tmp
+set directory=~/.tmp,/tmp
 set writebackup
 
 " Tab and split window manipulation
@@ -42,23 +38,27 @@ set splitright
 set splitbelow
 map <S-Left> :tabp<CR>
 map <S-Right> :tabn<CR>
-nmap <silent> <C-Up> :wincmd k<CR>
-nmap <silent> <C-Down> :wincmd j<CR>
-nmap <silent> <C-Left> :wincmd h<CR>
-nmap <silent> <C-Right> :wincmd l<CR>
-
-" Map F1 to escape
-map <F1> <Esc>
-imap <F1> <Esc>
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
 
 " Show tabs
 set list
 set listchars=tab:>-
 
 " Save and restore views
-set viewdir=C:/Users/louy/vimfiles/view
+set viewdir=~/.vim/view
 augroup AutoSaveFolds
   autocmd BufWinLeave * mkview
   autocmd BufWinEnter * silent loadview
 augroup END
 
+" Disable F1 help
+map <F1> <Esc>
+imap <F1> <Esc>
+ 
+" ycm conf file
+let g:ycm_confirm_extra_conf=1
+let g:ycm_global_ycm_extra_conf='/home/louy/.vim/.ycm_extra_conf.py'
+let g:ycm_max_diagnostic_to_display = 0
