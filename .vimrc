@@ -38,10 +38,12 @@ set splitright
 set splitbelow
 map <S-Left> :tabp<CR>
 map <S-Right> :tabn<CR>
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
+map <C-J> :tabp<CR>
+map <C-K> :tabn<CR>
+nnoremap <S-J> <C-W><C-J>
+nnoremap <S-K> <C-W><C-K>
+nnoremap <S-L> <C-W><C-L>
+nnoremap <S-H> <C-W><C-H>
 
 " Show tabs
 set list
@@ -57,8 +59,3 @@ augroup END
 " Disable F1 help
 map <F1> <Esc>
 imap <F1> <Esc>
- 
-" ycm conf file
-let g:ycm_confirm_extra_conf=1
-let g:ycm_global_ycm_extra_conf='/home/louy/.vim/.ycm_extra_conf.py'
-let g:ycm_max_diagnostic_to_display = 0
