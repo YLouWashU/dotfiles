@@ -36,10 +36,8 @@ set writebackup
 " Tab and split window manipulation
 set splitright
 set splitbelow
-map <S-Left> :tabp<CR>
-map <S-Right> :tabn<CR>
-map <C-J> :tabp<CR>
-map <C-K> :tabn<CR>
+map <C-H> :tabp<CR>
+map <C-L> :tabn<CR>
 nnoremap <S-J> <C-W><C-J>
 nnoremap <S-K> <C-W><C-K>
 nnoremap <S-L> <C-W><C-L>
@@ -59,3 +57,12 @@ augroup END
 " Disable F1 help
 map <F1> <Esc>
 imap <F1> <Esc>
+ 
+" copy to system clipboard
+set clipboard=unnamedplus
+
+" ycm conf file
+let g:ycm_confirm_extra_conf=1
+let g:ycm_global_ycm_extra_conf='/home/louy/.vim/.ycm_extra_conf.py'
+let g:ycm_max_diagnostic_to_display = 0
+
