@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# --- Configuration ---
+REMOTE_USER="louy"
+REMOTE_HOST="" # <-- Change to your actual DevServer IP
+
+LOCAL_DIR="$HOME/buck_arguments/"
+REMOTE_DIR="/home/louy/local/data/workdir_backup/buck_arguments/"
+
+# Formatting
+BOLD='\033[1m'
+NC='\033[0m'
+
+usage() {
+    echo -e "${BOLD}BUCK ARGUMENTS SYNC${NC}"
+    echo "Usage: buck_sync [push|pull]"
+    echo ""
+    echo "push: Local  ~/buck_arguments/ -> Remote"
+    echo "pull: Remote -> Local  ~/buck_arguments/"
+    exit 1
+}
+
+# Ensure an action is provided
+if [ -z "$1" ]; then usage; fi
+
+# Exclusions (things you don't want to sync)
+EXCLUDES=(--exclude '.git' --exclude '__pycache__' --exclude '.DS_Store' --exclude 'node_modules')
+
+case "$1" in
+    push)
+        echo -e "🚀 ${BOLD}Pushing${NC} all content from $LOCAL_DIR to server..."
+        # Ensure remote directory exists
+        ssh "$REMOTE_USER@$REMOTE_HOST" "mkdir -p $REMOTE_DIR"
+        # Syncing contents (trailing slashes ensure content-to-content sync)
+        rsync -avzP "${EXCLUDES[@]}" "$LOCAL_DIR" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR"
+        ;;
+
+    pull)
+        echo -e "📥 ${BOLD}Pulling${NC} all content from server to $LOCAL_DIR..."
+        # Ensure local directory exists
+        mkdir -p "$LOCAL_DIR"
+        rsync -avzP "${EXCLUDES[@]}" "$REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR" "$LOCAL_DIR"
+        ;;
+
+    *)
+        usage
+        ;;
+esac
+
+echo -e "✅ ${BOLD}Buck Sync Complete.${NC}"

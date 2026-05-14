@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# --- Config ---
+REMOTE_USER="louy"
+REMOTE_HOST=""
+
+# Absolute base paths
+LOCAL_BASE_DIR=$(realpath -m "$HOME/Calibration_data_link")
+REMOTE_BASE_DIR="/home/louy/local/data/workdir_backup/calibration_data"
+
+# --- Formatting ---
+BOLD='\033[1m'
+NC='\033[0m' 
+
+usage() {
+    echo -e "${BOLD}LOUY REMOTE SYNC${NC}"
+    echo "Usage: louy_remote_sync [push|pull|ls] [path]"
+    echo "Example: louy_remote_sync push ./"
+    echo "Example: louy_remote_sync ls test_1/"
+    exit 1
+}
+
+if [ $# -lt 2 ]; then usage; fi
+
+ACTION=$1
+TARGET_PATH=$2
+
+# 1. Resolve the absolute path of the target
+ABS_TARGET=$(realpath -m "$TARGET_PATH")
+
+# 2. Safety Check: Ensure the target is actually inside the Calibration folder
+if [[ "$ABS_TARGET" != "$LOCAL_BASE_DIR"* ]]; then
+    echo "❌ Error: Target must be inside $LOCAL_BASE_DIR"
+    echo "Target was: $ABS_TARGET"
+    exit 1
+fi
+
+# 3. Calculate the relative path from the base
+REL_PATH=${ABS_TARGET#$LOCAL_BASE_DIR}
+REL_PATH=${REL_PATH#/} # Strip leading slash if it exists
+
+# Handle empty REL_PATH (root of the sync folder)
+if [ -z "$REL_PATH" ]; then
+    REL_PATH="."
+fi
+
+# Construct paths
+FULL_REMOTE_PATH="$REMOTE_USER@$REMOTE_HOST:$REMOTE_BASE_DIR/$REL_PATH/"
+FULL_LOCAL_PATH="$ABS_TARGET/"
+
+# Exclusions
+EXCLUDES=(--exclude '.git' --exclude 'node_modules' --exclude '.DS_Store' --exclude '*.tmp')
+
+case "$ACTION" in
+    push)
+        if [ ! -d "$ABS_TARGET" ]; then
+            echo "❌ Error: Directory '$ABS_TARGET' does not exist."
+            exit 1
+        fi
+        echo -e "🚀 ${BOLD}Pushing${NC} [Calibration_data_link/$REL_PATH] to Server..."
+        ssh "$REMOTE_USER@$REMOTE_HOST" "mkdir -p $REMOTE_BASE_DIR/$REL_PATH"
+        rsync -avzP "${EXCLUDES[@]}" "$FULL_LOCAL_PATH" "$FULL_REMOTE_PATH"
+        ;;
+
+    pull)
+        echo -e "📥 ${BOLD}Pulling${NC} [Calibration_data_link/$REL_PATH] from Server..."
+        mkdir -p "$ABS_TARGET"
+        rsync -avzP "${EXCLUDES[@]}" "$FULL_REMOTE_PATH" "$FULL_LOCAL_PATH"
+        ;;
+
+    ls)
+        echo -e "🔍 ${BOLD}Remote Listing:${NC} $REMOTE_BASE_DIR/$REL_PATH"
+        echo "------------------------------------------------"
+        # Run ls on the remote server. We use 'ls -F' to show / for directories.
+        ssh "$REMOTE_USER@$REMOTE_HOST" "ls -ahF $REMOTE_BASE_DIR/$REL_PATH"
+        ;;
+
+    *)
+        usage
+        ;;
+esac
+
+echo -e "---"
+echo -e "✅ ${BOLD}Operation finished.${NC}"
